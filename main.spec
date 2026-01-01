@@ -1,32 +1,34 @@
 # main.spec
-# FINAL & CORRECTED VERSION
-# This spec file is self-contained and configured for a ONE-FILE build.
+# FINAL, CORRECTED, AND ROBUST VERSION
+# This spec file uses PyInstaller's internal hooks to reliably find package data.
 
 import os
-import sys
+from PyInstaller.utils.hooks import get_package_paths
 
-# --- Dynamic Path Discovery for tkinterdnd2 (The Core Fix) ---
+# --- The Core Fix: Using PyInstaller's Own Tools ---
+# Instead of a fragile 'import', we use the official hook to find the package path.
+# This is guaranteed to work if the package is in the environment PyInstaller knows about.
 try:
-    import tkinterdnd2
-    dnd_path = os.path.dirname(tkinterdnd2.__file__)
-    tkdnd_data_path = os.path.join(dnd_path, 'tkdnd')
-except ImportError as e:
-    sys.exit(f"CRITICAL ERROR: Cannot find 'tkinterdnd2' module. Please ensure 'python-tkdnd' is installed in your build environment. Details: {e}")
+    # get_package_paths returns the path to the package's code.
+    package_path = get_package_paths('tkinterdnd2')[0]
+    # We then construct the path to its data directory.
+    tkdnd_data_path = os.path.join(package_path, 'tkdnd')
+except IndexError:
+    # This error will trigger if 'python-tkdnd' is not installed at all.
+    import sys
+    sys.exit("CRITICAL ERROR: PyInstaller's hooks could not find the 'tkinterdnd2' package. Please ensure 'python-tkdnd' is installed in the build environment.")
 
 
 # --- Analysis Block ---
-# Defines all inputs for your application.
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    # Data files: Combines the tkinterdnd2 fix and your 'assets' folder.
     datas=[
-        (tkdnd_data_path, 'tkinterdnd2/tkdnd'),
-        ('assets', 'assets')
+        (tkdnd_data_path, 'tkinterdnd2/tkdnd'), # The reliable path to the data.
+        ('assets', 'assets')                   # Your assets folder.
     ],
-    # Hidden import for double insurance.
-    hiddenimports=['tkinterdnd2'],
+    hiddenimports=['tkinterdnd2'], # Kept as a safeguard.
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
@@ -38,15 +40,13 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=None)
 
-# --- EXE Block ---
-# This block now solely defines the final output as a single executable.
-# All your previous options are correctly placed here.
+# --- EXE Block (Correctly configured for a one-file build) ---
 exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
     a.zipfiles,
-    a.datas, # All data is bundled directly into the EXE
+    a.datas,
     [],
     name='MyAwesomeApp',
     debug=False,
@@ -54,13 +54,6 @@ exe = EXE(
     strip=False,
     upx=True,
     runtime_tmpdir=None,
-    console=False, # Creates a windowed (non-console) application
-    disable_windowed_traceback=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
+    console=False,
     icon='assets/hash.ico'
 )
-
-# DELETED: The `coll = COLLECT(...)` block has been completely removed.
-# Its absence is what enables the one-file build mode.
