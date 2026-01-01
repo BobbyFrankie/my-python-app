@@ -1,43 +1,41 @@
-# main.spec
-# FINAL, ROBUST, AND DIRECT PATH VERSION
-# This spec file abandons all auto-discovery hooks and builds the path manually.
+# THE FINAL AND CORRECT VERSION
+# Based on irrefutable file system reconnaissance.
 
 import os
-import site
 import sys
+import sysconfig
 
-# --- The Ultimate Fix: Direct Path Construction ---
-# We use Python's standard 'site' library to find the site-packages directory.
-# This is the most reliable way to locate installed packages.
+# --- The Ultimate Fix: Using the CORRECT Directory Name ---
 try:
-    # Find the primary site-packages directory.
-    site_packages_path = next(p for p in site.getsitepackages() if 'site-packages' in p)
-except StopIteration:
-    sys.exit("CRITICAL ERROR: Could not find the site-packages directory. The Python environment seems broken.")
+    # Step 1: Reliably find the site-packages directory.
+    site_packages_path = sysconfig.get_path('purelib')
+    if not site_packages_path or not os.path.exists(site_packages_path):
+        raise FileNotFoundError
+except (ImportError, FileNotFoundError):
+    sys.exit("CRITICAL ERROR: Could not determine the site-packages path. Your Python environment appears to be broken.")
 
-# We now construct the absolute path to the data directory we need.
-# This bypasses all of PyInstaller's faulty name recognition.
-tkdnd_data_path = os.path.join(site_packages_path, 'tkinterdnd2', 'tkdnd')
+# Step 2: Construct the path using the PROVEN, CORRECT directory name: "tkinterDnD".
+# THE CRITICAL FIX IS HERE.
+tkdnd_source_path = os.path.join(site_packages_path, 'tkinterDnD', 'tkdnd')
 
-# A crucial sanity check to ensure the path actually exists before we proceed.
-if not os.path.exists(tkdnd_data_path):
+# Step 3: A final sanity check. If this fails, the package installation itself is corrupted.
+if not os.path.exists(tkdnd_source_path):
     sys.exit(
-        f"CRITICAL ERROR: The tkinterdnd2 data directory was not found at the expected path: {tkdnd_data_path}. "
-        f"This indicates a problem with the 'python-tkdnd' installation."
+        f"CRITICAL ERROR: The data directory was not found at the correct path: {tkdnd_source_path}. "
+        f"This means the 'python-tkdnd' package is installed incorrectly or is a corrupted version."
     )
 
-
 # --- Analysis Block ---
-# This configuration is now based on a guaranteed, existing file path.
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
+    # The source is the CORRECT path, the destination is what the library code expects internally.
     datas=[
-        (tkdnd_data_path, 'tkinterdnd2/tkdnd'), # Using the direct, verified path.
-        ('assets', 'assets')                   # Your assets folder.
+        (tkdnd_source_path, 'tkinterdnd2/tkdnd'),
+        ('assets', 'assets')
     ],
-    hiddenimports=['tkinterdnd2'], # Kept as a final safeguard.
+    hiddenimports=['tkinterdnd2'],
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
@@ -49,7 +47,7 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=None)
 
-# --- EXE Block (Correct for one-file build) ---
+# --- EXE Block ---
 exe = EXE(
     pyz,
     a.scripts,
