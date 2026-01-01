@@ -33,11 +33,13 @@ jobs:
           pip install pyinstaller
           if (Test-Path requirements.txt) { pip install -r requirements.txt }
 
+      - name: Force-install tkinterdnd2 for PyInstaller context
+        run: pip install python-tkdnd==0.2.1
       # 步骤四：使用 PyInstaller 打包
       # 核心打包命令
       - name: Build with PyInstaller
         run: pyinstaller main.spec
-          
+
       # 步骤五：上传打包好的 exe 文件
       # 将 dist 文件夹中的 exe 文件作为“产物”上传，以便下载
       - name: Upload artifact
