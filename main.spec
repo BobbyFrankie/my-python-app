@@ -1,34 +1,43 @@
 # main.spec
-# FINAL, CORRECTED, AND ROBUST VERSION
-# This spec file uses PyInstaller's internal hooks to reliably find package data.
+# FINAL, ROBUST, AND DIRECT PATH VERSION
+# This spec file abandons all auto-discovery hooks and builds the path manually.
 
 import os
-from PyInstaller.utils.hooks import get_package_paths
+import site
+import sys
 
-# --- The Core Fix: Using PyInstaller's Own Tools ---
-# Instead of a fragile 'import', we use the official hook to find the package path.
-# This is guaranteed to work if the package is in the environment PyInstaller knows about.
+# --- The Ultimate Fix: Direct Path Construction ---
+# We use Python's standard 'site' library to find the site-packages directory.
+# This is the most reliable way to locate installed packages.
 try:
-    # get_package_paths returns the path to the package's code.
-    package_path = get_package_paths('tkinterdnd2')[0]
-    # We then construct the path to its data directory.
-    tkdnd_data_path = os.path.join(package_path, 'tkdnd')
-except IndexError:
-    # This error will trigger if 'python-tkdnd' is not installed at all.
-    import sys
-    sys.exit("CRITICAL ERROR: PyInstaller's hooks could not find the 'tkinterdnd2' package. Please ensure 'python-tkdnd' is installed in the build environment.")
+    # Find the primary site-packages directory.
+    site_packages_path = next(p for p in site.getsitepackages() if 'site-packages' in p)
+except StopIteration:
+    sys.exit("CRITICAL ERROR: Could not find the site-packages directory. The Python environment seems broken.")
+
+# We now construct the absolute path to the data directory we need.
+# This bypasses all of PyInstaller's faulty name recognition.
+tkdnd_data_path = os.path.join(site_packages_path, 'tkinterdnd2', 'tkdnd')
+
+# A crucial sanity check to ensure the path actually exists before we proceed.
+if not os.path.exists(tkdnd_data_path):
+    sys.exit(
+        f"CRITICAL ERROR: The tkinterdnd2 data directory was not found at the expected path: {tkdnd_data_path}. "
+        f"This indicates a problem with the 'python-tkdnd' installation."
+    )
 
 
 # --- Analysis Block ---
+# This configuration is now based on a guaranteed, existing file path.
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
     datas=[
-        (tkdnd_data_path, 'tkinterdnd2/tkdnd'), # The reliable path to the data.
+        (tkdnd_data_path, 'tkinterdnd2/tkdnd'), # Using the direct, verified path.
         ('assets', 'assets')                   # Your assets folder.
     ],
-    hiddenimports=['tkinterdnd2'], # Kept as a safeguard.
+    hiddenimports=['tkinterdnd2'], # Kept as a final safeguard.
     hookspath=[],
     runtime_hooks=[],
     excludes=[],
@@ -40,7 +49,7 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=None)
 
-# --- EXE Block (Correctly configured for a one-file build) ---
+# --- EXE Block (Correct for one-file build) ---
 exe = EXE(
     pyz,
     a.scripts,
