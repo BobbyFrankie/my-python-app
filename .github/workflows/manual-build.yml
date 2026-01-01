@@ -36,12 +36,7 @@ jobs:
       # 步骤四：使用 PyInstaller 打包
       # 核心打包命令
       - name: Build with PyInstaller
-        run: |
-          # 方案A：基础单文件打包
-          # pyinstaller --onefile --name "MyAwesomeApp" main.py
-          
-          # 方案B：带图标和数据文件的打包（如果需要，请取消下面的注释并修改）
-          pyinstaller --onefile main.spec
+        run: pyinstaller main.spec
           
       # 步骤五：上传打包好的 exe 文件
       # 将 dist 文件夹中的 exe 文件作为“产物”上传，以便下载
