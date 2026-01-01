@@ -23,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9' # <-- 在这里修改为项目使用的 Python 版本
+          python-version: '3.11' # <-- 在这里修改为项目使用的 Python 版本
 
       # 步骤三：安装项目依赖
       # 安装 PyInstaller 和 requirements.txt 中列出的所有库
