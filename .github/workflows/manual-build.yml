@@ -47,6 +47,7 @@ jobs:
             --name "MyAwesomeApp" `
             --icon "assets/hash.ico" `
             --add-data "assets;assets" `
+            --hidden-import=tkinterdnd2 `
             main.py
           
       # 步骤五：上传打包好的 exe 文件
