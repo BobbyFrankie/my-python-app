@@ -41,14 +41,7 @@ jobs:
           # pyinstaller --onefile --name "MyAwesomeApp" main.py
           
           # 方案B：带图标和数据文件的打包（如果需要，请取消下面的注释并修改）
-          pyinstaller `
-            --onefile `
-            --windowed `
-            --name "MyAwesomeApp" `
-            --icon "assets/hash.ico" `
-            --add-data "assets;assets" `
-            --hidden-import=tkinterdnd2 `
-            main.py
+          pyinstaller --onefile main.spec
           
       # 步骤五：上传打包好的 exe 文件
       # 将 dist 文件夹中的 exe 文件作为“产物”上传，以便下载
