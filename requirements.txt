@@ -50,6 +50,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
 python-multipart==0.0.21
 python-pptx==1.0.2
+python-tkdnd==2.10.1
 pytz==2025.2
 requests==2.32.5
 six==1.17.0
@@ -58,7 +59,6 @@ SpeechRecognition==3.14.4
 sse-starlette==3.0.4
 starlette==0.50.0
 sympy==1.14.0
-tkinterdnd2-tk==0.3.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 tzdata==2025.3
@@ -67,6 +67,7 @@ uvicorn==0.38.0
 xlrd==2.0.2
 xlsxwriter==3.2.9
 youtube-transcript-api==1.0.3
+
 
 
 
