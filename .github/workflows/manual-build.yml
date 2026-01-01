@@ -33,50 +33,15 @@ jobs:
           pip install pyinstaller
           if (Test-Path requirements.txt) { pip install -r requirements.txt }
 
-      - name: Final Forensic Analysis of tkinterDnD
-        id: forensic_analysis
-        shell: powershell
-        run: |
-          echo "--- Commencing Final Forensic Analysis ---"
-          try {
-            # Step 1: Reliably find the site-packages directory.
-            $site_packages = python -c "import sysconfig; print(sysconfig.get_path('purelib'))"
-            if ([string]::IsNullOrWhiteSpace($site_packages)) {
-              echo "FATAL: Could not determine site-packages path."
-              exit 1
-            }
-            echo "Site-packages located at: $site_packages"
-
-            # Step 2: Define the target directory based on previous recon.
-            $target_dir = Join-Path $site_packages "tkinterDnD"
-            echo "Probing target directory: $target_dir"
-            
-            # Step 3: Perform forensic listing.
-            if (Test-Path $target_dir) {
-              echo "SUCCESS: Target directory '$target_dir' exists. Performing deep forensic scan..."
-              # This is the most important command. List everything inside, recursively.
-              Get-ChildItem -Path $target_dir -Recurse | ForEach-Object { $_.FullName }
-              echo "--- Forensic Scan Complete ---"
-            } else {
-              # This case should not happen based on the last log, but is a safeguard.
-              echo "CATASTROPHIC ANOMALY: The 'tkinterDnD' directory, previously detected, has vanished. Build environment is unstable."
-              exit 1
-            }
-          } catch {
-            echo "A fatal error occurred during the forensic analysis script."
-            Write-Error $_
-            exit 1
-          }
-
       # 步骤四：使用 PyInstaller 打包
       # 核心打包命令
-      # - name: Build with PyInstaller
-      #   run: pyinstaller main.spec
+      - name: Build with PyInstaller
+        run: pyinstaller main.spec
 
       # 步骤五：上传打包好的 exe 文件
       # 将 dist 文件夹中的 exe 文件作为“产物”上传，以便下载
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: windows-executable # 下载的 zip 文件名
-      #     path: dist/*.exe # 告诉 GitHub 去哪里找打包好的 exe 文件
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-executable # 下载的 zip 文件名
+          path: dist/*.exe # 告诉 GitHub 去哪里找打包好的 exe 文件
