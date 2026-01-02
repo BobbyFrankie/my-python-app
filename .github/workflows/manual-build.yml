@@ -23,7 +23,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11' # <-- 在这里修改为项目使用的 Python 版本
+          python-version: '3.12' # <-- 在这里修改为项目使用的 Python 版本
 
       # 步骤三：安装项目依赖
       # 安装 PyInstaller 和 requirements.txt 中列出的所有库
@@ -36,7 +36,12 @@ jobs:
       # 步骤四：使用 PyInstaller 打包
       # 核心打包命令
       - name: Build with PyInstaller
-        run: pyinstaller main.spec
+        run: |
+          pyinstaller --noconsole --onefile --name "hash" `
+          --icon="assets/hash.ico" `
+          --add-data="assets;assets" `
+          --add-data="icons;icons" `
+          main.py
 
       # 步骤五：上传打包好的 exe 文件
       # 将 dist 文件夹中的 exe 文件作为“产物”上传，以便下载
