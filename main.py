@@ -2,10 +2,23 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from tkinterdnd2 import TkinterDnD, DND_FILES
 import hashlib
+import sys
 import os
 import time
 import threading
 from datetime import datetime
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+if hasattr(sys, '_MEIPASS'):
+    os.environ['TKDND_LIBRARY'] = resource_path('tkinterdnd2/tkdnd')
 
 class MD5Calculator:
     def __init__(self, root):
@@ -130,8 +143,8 @@ class MD5Calculator:
         self.compare_text_label.pack(side=tk.LEFT, padx=2)
          
         # 加载图片
-        self.correct_image = tk.PhotoImage(file="icons/correct.png")
-        self.error_image = tk.PhotoImage(file="icons/error.png")
+        self.correct_image = tk.PhotoImage(file=resource_path("icons/correct.png"))
+        self.error_image = tk.PhotoImage(file=resource_path("icons/error.png"))
  
         # 文件信息
         self.info_frame = ttk.Frame(self.file_tab)
