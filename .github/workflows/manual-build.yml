@@ -37,8 +37,8 @@ jobs:
       # 核心打包命令
       - name: Build with PyInstaller
         run: |
-          pyinstaller --noconsole --onefile --name "hash" `
-          --icon="assets/hash.ico" `
+          pyinstaller --noconsole --onefile --name "file-hash-calculator" `
+          --icon="assets/app.ico" `
           --add-data="assets;assets" `
           --add-data="icons;icons" `
           main.py
